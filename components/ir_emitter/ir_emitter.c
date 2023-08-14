@@ -1,7 +1,10 @@
 #include "ir_emitter.h"
 
-#include <stdint.h>
 #include <stdbool.h>
+
+// ESP
+#include "esp_err.h"
+#include "esp_log.h"
 
 #include "driver/ledc.h"
 #include "driver/timer.h"
@@ -15,10 +18,63 @@
 /** Modulation frequency */
 #define IR_CARRIER_FREQ         38000
 
-/** Controller timer (frequency = 80MHz / 800) */
+/** Controller timer (period = 800 / 80MHz = 10us) */
 #define IR_CTL_TIMER_GROUP      TIMER_GROUP_0
 #define IR_CTL_TIMER_IDX        TIMER_0
 #define IR_CTL_TIMER_DIVIDER    800
+
+/** NEC timings (in multiples of 10us)*/
+#define IR_SIGNAL_START_HIGH_TIME   450
+#define IR_SIGNAL_START_LOW_TIME    450
+#define IR_SIGNAL_BIT_HIGH_TIME     56
+#define IR_SIGNAL_BIT_0_LOW_TIME    56
+#define IR_SIGNAL_BIT_1_LOW_TIME    169
+
+#define IR_SIGNAL_MAX_SIZE          256
+
+typedef struct {
+    bool in_progress;
+    bool state;
+    uint64_t index;
+    uint64_t timer_counter;
+    uint64_t size;
+} ir_trx_t;
+
+static ir_trx_t ir_trx = { 0 };
+static uint64_t ir_signal[IR_SIGNAL_MAX_SIZE] = { 0 };
+
+static bool timer_callback(void* arg)
+{
+    if (ir_trx.timer_counter == 0) {
+        if (ir_trx.state == true) {
+            ledc_set_duty(LEDC_HIGH_SPEED_MODE, IR_PWM_CH, 50);
+        } else {
+            ledc_set_duty(LEDC_HIGH_SPEED_MODE, IR_PWM_CH, 0);
+        }
+
+        ledc_update_duty(LEDC_HIGH_SPEED_MODE, IR_PWM_CH);
+
+        ir_trx.state = !ir_trx.state;
+    }
+
+    if (ir_trx.timer_counter == ir_signal[ir_trx.index]) {
+        ir_trx.timer_counter = 0;
+        ir_trx.index++;
+
+        if (ir_trx.index >= ir_trx.size) {
+            ir_trx.in_progress = false;
+
+            ledc_set_duty(LEDC_HIGH_SPEED_MODE, IR_PWM_CH, 0);
+            ledc_update_duty(LEDC_HIGH_SPEED_MODE, IR_PWM_CH);
+
+            timer_pause(IR_CTL_TIMER_GROUP, IR_CTL_TIMER_IDX);
+        }
+    } else {
+        ir_trx.timer_counter++;
+    }
+
+    return false;
+}
 
 void ir_emitter_setup(void) {
     // PWM
@@ -58,4 +114,42 @@ void ir_emitter_setup(void) {
     timer_set_alarm_value(IR_CTL_TIMER_GROUP, IR_CTL_TIMER_IDX, 1);
     timer_enable_intr(IR_CTL_TIMER_GROUP, IR_CTL_TIMER_IDX);
     timer_isr_callback_add(IR_CTL_TIMER_GROUP, IR_CTL_TIMER_IDX, timer_callback, NULL, 0);
+}
+
+void ir_emitter_nec(uint32_t value)
+{
+    if (ir_trx.in_progress == true) {
+        return;
+    }
+
+    timer_pause(IR_CTL_TIMER_GROUP, IR_CTL_TIMER_IDX);
+
+    ir_trx.state = true;
+    ir_trx.index = 0;
+    ir_trx.size = 0;
+    ir_trx.timer_counter = 0;
+
+    // Start
+    ir_signal[ir_trx.size++] = IR_SIGNAL_START_HIGH_TIME;
+    ir_signal[ir_trx.size++] = IR_SIGNAL_START_LOW_TIME;
+
+    // Bits
+    for (int i = 31; i >= 0; i--) {
+        ir_signal[ir_trx.size++] = IR_SIGNAL_BIT_HIGH_TIME;
+
+        if ((value & (1 << i)) == 0) {
+            // 0
+            ir_signal[ir_trx.size++] = IR_SIGNAL_BIT_0_LOW_TIME;
+        } else {
+            // 1
+            ir_signal[ir_trx.size++] = IR_SIGNAL_BIT_1_LOW_TIME;
+        }
+    }
+
+    // End
+    ir_signal[ir_trx.size++] = IR_SIGNAL_BIT_HIGH_TIME;
+    ir_signal[ir_trx.size++] = IR_SIGNAL_BIT_0_LOW_TIME;
+
+    ir_trx.in_progress = true;
+    timer_start(IR_CTL_TIMER_GROUP, IR_CTL_TIMER_IDX);
 }

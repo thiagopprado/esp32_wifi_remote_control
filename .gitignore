@@ -62,6 +62,8 @@ sdkconfig
 
 # eclipse project
 .orig
+.project
+.cproject
 
 # vscode project
 .vscode

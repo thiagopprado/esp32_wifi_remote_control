@@ -13,5 +13,6 @@
 
 void ir_emitter_setup(void);
 void ir_emitter_nec(uint32_t value);
+void ir_emitter_raw(uint64_t raw_signal[], uint64_t size);
 
 #endif /** IR_EMITTER_H */

@@ -1,6 +1,7 @@
 #include "ir_emitter.h"
 
 #include <stdbool.h>
+#include <string.h>
 
 // ESP
 #include "esp_err.h"
@@ -149,6 +150,26 @@ void ir_emitter_nec(uint32_t value)
     // End
     ir_signal[ir_trx.size++] = IR_SIGNAL_BIT_HIGH_TIME;
     ir_signal[ir_trx.size++] = IR_SIGNAL_BIT_0_LOW_TIME;
+
+    ir_trx.in_progress = true;
+    timer_start(IR_CTL_TIMER_GROUP, IR_CTL_TIMER_IDX);
+}
+
+void ir_emitter_raw(uint64_t raw_signal[], uint64_t size)
+{
+    if (ir_trx.in_progress == true) {
+        return;
+    }
+
+    timer_pause(IR_CTL_TIMER_GROUP, IR_CTL_TIMER_IDX);
+
+    ir_trx.state = true;
+    ir_trx.index = 0;
+    ir_trx.size = 0;
+    ir_trx.timer_counter = 0;
+
+    memcpy(ir_signal, raw_signal, size * sizeof(uint64_t));
+    ir_trx.size = size;
 
     ir_trx.in_progress = true;
     timer_start(IR_CTL_TIMER_GROUP, IR_CTL_TIMER_IDX);

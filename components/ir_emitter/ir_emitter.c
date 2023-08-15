@@ -36,13 +36,13 @@
 typedef struct {
     bool in_progress;
     bool state;
-    uint64_t index;
-    uint64_t timer_counter;
-    uint64_t size;
+    uint16_t index;
+    uint16_t timer_counter;
+    uint16_t size;
 } ir_trx_t;
 
 static ir_trx_t ir_trx = { 0 };
-static uint64_t ir_signal[IR_SIGNAL_MAX_SIZE] = { 0 };
+static uint16_t ir_signal[IR_SIGNAL_MAX_SIZE] = { 0 };
 
 static bool timer_callback(void* arg)
 {
@@ -155,7 +155,7 @@ void ir_emitter_nec(uint32_t value)
     timer_start(IR_CTL_TIMER_GROUP, IR_CTL_TIMER_IDX);
 }
 
-void ir_emitter_raw(uint64_t raw_signal[], uint64_t size)
+void ir_emitter_raw(uint16_t raw_signal[], uint16_t size)
 {
     if (ir_trx.in_progress == true) {
         return;
@@ -168,7 +168,7 @@ void ir_emitter_raw(uint64_t raw_signal[], uint64_t size)
     ir_trx.size = 0;
     ir_trx.timer_counter = 0;
 
-    memcpy(ir_signal, raw_signal, size * sizeof(uint64_t));
+    memcpy(ir_signal, raw_signal, size * sizeof(uint16_t));
     ir_trx.size = size;
 
     ir_trx.in_progress = true;

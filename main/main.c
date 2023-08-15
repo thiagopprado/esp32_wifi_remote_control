@@ -29,7 +29,7 @@ void app_main(void)
 
     while (true) {
         if (gpio_get_level(GPIO_NUM_0) == false) {
-            ir_emitter_nec(IR_NEC_SAMSUNG_ENTER);
+            ir_emitter_sky(IR_SKY_ON);
         }
 
         vTaskDelay(pdMS_TO_TICKS(100));

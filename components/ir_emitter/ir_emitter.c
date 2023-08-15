@@ -25,11 +25,16 @@
 #define IR_CTL_TIMER_DIVIDER    800
 
 /** NEC timings (in multiples of 10us)*/
-#define IR_SIGNAL_START_HIGH_TIME   450
-#define IR_SIGNAL_START_LOW_TIME    450
-#define IR_SIGNAL_BIT_HIGH_TIME     56
-#define IR_SIGNAL_BIT_0_LOW_TIME    56
-#define IR_SIGNAL_BIT_1_LOW_TIME    169
+#define IR_NEC_START_HIGH_TIME  450
+#define IR_NEC_START_LOW_TIME   450
+#define IR_NEC_BIT_HIGH_TIME    56
+#define IR_NEC_BIT_0_LOW_TIME   56
+#define IR_NEC_BIT_1_LOW_TIME   169
+
+/** SKY timings (in multiples of 10us)*/
+#define IR_SKY_START_TIME       600
+#define IR_SKY_BIT_0_TIME       60
+#define IR_SKY_BIT_1_TIME       120
 
 #define IR_SIGNAL_MAX_SIZE          256
 
@@ -131,31 +136,67 @@ void ir_emitter_nec(uint32_t value)
     ir_trx.timer_counter = 0;
 
     // Start
-    ir_signal[ir_trx.size++] = IR_SIGNAL_START_HIGH_TIME;
-    ir_signal[ir_trx.size++] = IR_SIGNAL_START_LOW_TIME;
+    ir_signal[ir_trx.size++] = IR_NEC_START_HIGH_TIME;
+    ir_signal[ir_trx.size++] = IR_NEC_START_LOW_TIME;
 
     // Bits
     for (int i = 31; i >= 0; i--) {
-        ir_signal[ir_trx.size++] = IR_SIGNAL_BIT_HIGH_TIME;
+        ir_signal[ir_trx.size++] = IR_NEC_BIT_HIGH_TIME;
 
         if ((value & (1 << i)) == 0) {
             // 0
-            ir_signal[ir_trx.size++] = IR_SIGNAL_BIT_0_LOW_TIME;
+            ir_signal[ir_trx.size++] = IR_NEC_BIT_0_LOW_TIME;
         } else {
             // 1
-            ir_signal[ir_trx.size++] = IR_SIGNAL_BIT_1_LOW_TIME;
+            ir_signal[ir_trx.size++] = IR_NEC_BIT_1_LOW_TIME;
         }
     }
 
     // End
-    ir_signal[ir_trx.size++] = IR_SIGNAL_BIT_HIGH_TIME;
-    ir_signal[ir_trx.size++] = IR_SIGNAL_BIT_0_LOW_TIME;
+    ir_signal[ir_trx.size++] = IR_NEC_BIT_HIGH_TIME;
+    ir_signal[ir_trx.size++] = IR_NEC_BIT_0_LOW_TIME;
 
     ir_trx.in_progress = true;
     timer_start(IR_CTL_TIMER_GROUP, IR_CTL_TIMER_IDX);
 }
 
-void ir_emitter_raw(uint16_t raw_signal[], uint16_t size)
+void ir_emitter_sky(uint16_t value)
+{
+    if (ir_trx.in_progress == true) {
+        return;
+    }
+
+    timer_pause(IR_CTL_TIMER_GROUP, IR_CTL_TIMER_IDX);
+
+    ir_trx.state = true;
+    ir_trx.index = 0;
+    ir_trx.size = 0;
+    ir_trx.timer_counter = 0;
+
+    ir_signal[ir_trx.size++] = IR_SKY_START_TIME;
+
+    ir_signal[ir_trx.size++] = IR_SKY_BIT_1_TIME;
+    ir_signal[ir_trx.size++] = IR_SKY_BIT_1_TIME;
+    ir_signal[ir_trx.size++] = IR_SKY_BIT_1_TIME;
+    ir_signal[ir_trx.size++] = IR_SKY_BIT_0_TIME;
+    ir_signal[ir_trx.size++] = IR_SKY_BIT_0_TIME;
+
+    for (int i = 0; i < 12; i++) {
+        if ((value & (1 << i)) != 0) {
+            ir_signal[ir_trx.size++] = IR_SKY_BIT_1_TIME;
+        } else {
+            ir_signal[ir_trx.size++] = IR_SKY_BIT_0_TIME;
+        }
+    }
+
+    ir_signal[ir_trx.size++] = IR_SKY_BIT_0_TIME;
+
+    ir_trx.in_progress = true;
+    timer_start(IR_CTL_TIMER_GROUP, IR_CTL_TIMER_IDX);
+
+}
+
+void ir_emitter_raw(const uint16_t raw_signal[], uint16_t size)
 {
     if (ir_trx.in_progress == true) {
         return;

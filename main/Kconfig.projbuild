@@ -12,4 +12,18 @@ menu "WIFI RC configuration"
         help
         WiFi password (WPA or WPA2) to use.
 
+    config WIFI_RC_IP
+        string "ESP IP"
+        default "192.168.1.100"
+        help
+        Fixed IP for ESP.
+
+    config WIFI_RC_GATEWAY
+        string "Gateway"
+        default "192.168.1.254"
+
+    config WIFI_RC_NETMASK
+        string "Netmask"
+        default "255.255.255.0"
+
 endmenu

@@ -19,6 +19,7 @@
 #include "driver/gpio.h"
 
 #include "ir_emitter.h"
+#include "wifi_ctl.h"
 
 void app_main(void)
 {

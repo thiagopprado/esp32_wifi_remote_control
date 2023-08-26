@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+    <header>
+        <meta name="viewport" content="user-scalable=0">
+    </header>
+    <head>
+        <title>Wifi remote controller</title>
+    </head>
+    <body>
+        <button style="width: 200px;height: 100px;font-size: 30px;" onclick="send_command('on')" > ON </button>
+        <button style="width: 200px;height: 100px;font-size: 30px;" onclick="send_command('off')" > OFF </button>
+        <br><br>
+        <button style="width: 200px;height: 100px;font-size: 30px;" onclick="send_command('guide')" > Guia </button>
+        <button style="width: 200px;height: 100px;font-size: 30px;" onclick="send_command('menu')" > Menu </button>
+        <button style="width: 200px;height: 100px;font-size: 30px;" onclick="send_command('esc')" > Sair </button>
+        <br><br>
+        <button style="width: 200px;height: 100px;font-size: 30px;" onclick="send_command('left')" > < </button>
+        <button style="width: 200px;height: 100px;font-size: 30px;" onclick="send_command('up')" > ^ </button>
+        <button style="width: 200px;height: 100px;font-size: 30px;" onclick="send_command('down')" > v </button>
+        <button style="width: 200px;height: 100px;font-size: 30px;" onclick="send_command('right')" > > </button>
+        <br><br>
+        <button style="width: 200px;height: 100px;font-size: 30px;" onclick="send_command('last_ch')" > Ultimo CH </button>
+        <button style="width: 200px;height: 100px;font-size: 30px;" onclick="send_command('list')" > Lista </button>
+        <button style="width: 200px;height: 100px;font-size: 30px;" onclick="send_command('info')" > Info </button>
+        <button style="width: 200px;height: 100px;font-size: 30px;" onclick="send_command('confirm')" > Confirm </button>
+        <br><br>
+        <button style="width: 200px;height: 100px;font-size: 30px;" onclick="send_command('ch_up')" > CH + </button>
+        <br><br>
+        <button style="width: 200px;height: 100px;font-size: 30px;" onclick="send_command('ch_down')" > CH - </button>
+        <br><br>
+        <button style="width: 200px;height: 100px;font-size: 30px;" onclick="send_command('1')" > 1 </button>
+        <button style="width: 200px;height: 100px;font-size: 30px;" onclick="send_command('2')" > 2 </button>
+        <button style="width: 200px;height: 100px;font-size: 30px;" onclick="send_command('3')" > 3 </button>
+        <br><br>
+        <button style="width: 200px;height: 100px;font-size: 30px;" onclick="send_command('4')" > 4 </button>
+        <button style="width: 200px;height: 100px;font-size: 30px;" onclick="send_command('5')" > 5 </button>
+        <button style="width: 200px;height: 100px;font-size: 30px;" onclick="send_command('6')" > 6 </button>
+        <br><br>
+        <button style="width: 200px;height: 100px;font-size: 30px;" onclick="send_command('7')" > 7 </button>
+        <button style="width: 200px;height: 100px;font-size: 30px;" onclick="send_command('8')" > 8 </button>
+        <button style="width: 200px;height: 100px;font-size: 30px;" onclick="send_command('9')" > 9 </button>
+        <br><br>
+        <button style="width: 200px;height: 100px;font-size: 30px;" onclick="send_command('dash')" > Dash </button>
+        <button style="width: 200px;height: 100px;font-size: 30px;" onclick="send_command('0')" > 0 </button>
+        <button style="width: 200px;height: 100px;font-size: 30px;" onclick="send_command('enter')" > Enter </button>
+    </body>
+    <script>
+    function send_command(cmd)
+    {
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "/command");
+        xhttp.send(cmd);
+    }
+    </script>
+</html>

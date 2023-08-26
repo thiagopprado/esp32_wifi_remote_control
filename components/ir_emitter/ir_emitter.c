@@ -11,7 +11,7 @@
 #include "driver/timer.h"
 
 /** IR LED GPIO */
-#define IR_GPIO                 25
+#define IR_GPIO                 15
 
 #define IR_PWM_TIMER            LEDC_TIMER_1
 #define IR_PWM_CH               LEDC_CHANNEL_0

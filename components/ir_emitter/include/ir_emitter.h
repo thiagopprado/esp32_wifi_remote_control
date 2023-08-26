@@ -16,13 +16,14 @@
 #define IR_SKY_OFF      0x0F81
 #define IR_SKY_GUIDE    0x0014
 #define IR_SKY_LIST     0x0454
-#define IR_SKY_EXIT     0x0F64
+#define IR_SKY_INFO     0x0A74
+#define IR_SKY_ESC      0x0F64
 #define IR_SKY_UP       0x0D84
 #define IR_SKY_LEFT     0x0BC4
 #define IR_SKY_RIGHT    0x0B24
 #define IR_SKY_DOWN     0x0344
 #define IR_SKY_CONFIRM  0x07A4
-#define IR_SKY_MENU     0x07A4
+#define IR_SKY_MENU     0x0504
 #define IR_SKY_LAST_CH  0x03F0
 #define IR_SKY_CH_UP    0x05B0
 #define IR_SKY_CH_DOWN  0x0D70

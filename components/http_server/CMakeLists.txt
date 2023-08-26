@@ -1,9 +1,9 @@
 idf_component_register(
     SRCS
-        "wifi_ctl.c"
+        "http_server.c"
     INCLUDE_DIRS
         "include"
     PRIV_REQUIRES
-        main 
-        http_server
+        main
+    EMBED_FILES "index.html"
 )

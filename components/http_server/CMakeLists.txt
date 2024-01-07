@@ -6,4 +6,5 @@ idf_component_register(
     PRIV_REQUIRES
         main
     EMBED_FILES "index.html"
+    EMBED_FILES "favicon.ico"
 )

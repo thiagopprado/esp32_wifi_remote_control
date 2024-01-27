@@ -23,125 +23,159 @@
 
 #include "http_server.h"
 
+#define IR_CMD_NR               (sizeof(ir_command) / sizeof (ir_command_t))
+#define IR_CMD_QUEUE_BUFFER_SZ  10
+#define IR_CMD_QUEUE_SZ         10
+#define IR_CMD_MULTICODE_NR     5
+
 typedef struct {
     char* description;
-    uint16_t code;
+    uint16_t code[IR_CMD_MULTICODE_NR];
+    uint8_t code_nr;
 } ir_command_t;
 
 static ir_command_t ir_command[] = {
     {
         .description = "on",
-        .code = IR_SKY_ON,
+        .code = { IR_SKY_ON },
+        .code_nr = 1,
     },
     {
         .description = "off",
-        .code = IR_SKY_OFF,
+        .code = { IR_SKY_OFF },
+        .code_nr = 1,
     },
     {
         .description = "guide",
-        .code = IR_SKY_GUIDE,
+        .code = { IR_SKY_GUIDE },
+        .code_nr = 1,
     },
     {
         .description = "list",
-        .code = IR_SKY_LIST,
+        .code = { IR_SKY_LIST },
+        .code_nr = 1,
     },
     {
         .description = "info",
-        .code = IR_SKY_INFO,
+        .code = { IR_SKY_INFO },
+        .code_nr = 1,
     },
     {
         .description = "esc",
-        .code = IR_SKY_ESC,
+        .code = { IR_SKY_ESC },
+        .code_nr = 1,
     },
     {
         .description = "up",
-        .code = IR_SKY_UP,
+        .code = { IR_SKY_UP },
+        .code_nr = 1,
     },
     {
         .description = "left",
-        .code = IR_SKY_LEFT,
+        .code = { IR_SKY_LEFT },
+        .code_nr = 1,
     },
     {
         .description = "right",
-        .code = IR_SKY_RIGHT,
+        .code = { IR_SKY_RIGHT },
+        .code_nr = 1,
     },
     {
         .description = "down",
-        .code = IR_SKY_DOWN,
+        .code = { IR_SKY_DOWN },
+        .code_nr = 1,
     },
     {
         .description = "confirm",
-        .code = IR_SKY_CONFIRM,
+        .code = { IR_SKY_CONFIRM },
+        .code_nr = 1,
     },
     {
         .description = "menu",
-        .code = IR_SKY_MENU,
+        .code = { IR_SKY_MENU },
+        .code_nr = 1,
     },
     {
         .description = "last_ch",
-        .code = IR_SKY_LAST_CH,
+        .code = { IR_SKY_LAST_CH },
+        .code_nr = 1,
     },
     {
         .description = "ch_up",
-        .code = IR_SKY_CH_UP,
+        .code = { IR_SKY_CH_UP },
+        .code_nr = 1,
     },
     {
         .description = "ch_down",
-        .code = IR_SKY_CH_DOWN,
+        .code = { IR_SKY_CH_DOWN },
+        .code_nr = 1,
     },
     {
         .description = "dash",
-        .code = IR_SKY_DASH,
+        .code = { IR_SKY_DASH },
+        .code_nr = 1,
     },
     {
         .description = "enter",
-        .code = IR_SKY_ENTER,
+        .code = { IR_SKY_ENTER },
+        .code_nr = 1,
     },
     {
         .description = "1",
-        .code = IR_SKY_1,
+        .code = { IR_SKY_1 },
+        .code_nr = 1,
     },
     {
         .description = "2",
-        .code = IR_SKY_2,
+        .code = { IR_SKY_2 },
+        .code_nr = 1,
     },
     {
         .description = "3",
-        .code = IR_SKY_3,
+        .code = { IR_SKY_3 },
+        .code_nr = 1,
     },
     {
         .description = "4",
-        .code = IR_SKY_4,
+        .code = { IR_SKY_4 },
+        .code_nr = 1,
     },
     {
         .description = "5",
-        .code = IR_SKY_5,
+        .code = { IR_SKY_5 },
+        .code_nr = 1,
     },
     {
         .description = "6",
-        .code = IR_SKY_6,
+        .code = { IR_SKY_6 },
+        .code_nr = 1,
     },
     {
         .description = "7",
-        .code = IR_SKY_7,
+        .code = { IR_SKY_7 },
+        .code_nr = 1,
     },
     {
         .description = "8",
-        .code = IR_SKY_8,
+        .code = { IR_SKY_8 },
+        .code_nr = 1,
     },
     {
         .description = "9",
-        .code = IR_SKY_9,
+        .code = { IR_SKY_9 },
+        .code_nr = 1,
     },
     {
         .description = "0",
-        .code = IR_SKY_0,
+        .code = { IR_SKY_0 },
+        .code_nr = 1,
+    },
+    {
+        .description = "sportv",
+        .code = { IR_SKY_4, IR_SKY_3, IR_SKY_9, IR_SKY_ENTER },
+        .code_nr = 4,
     },
 };
-
-#define IR_CMD_NR               (sizeof(ir_command) / sizeof (ir_command_t))
-#define IR_CMD_QUEUE_BUFFER_SZ  10
-#define IR_CMD_QUEUE_SZ         10
 
 QueueHandle_t ir_queue_handler = NULL;
 
@@ -175,7 +209,10 @@ void app_main(void)
         for (size_t i = 0; i < IR_CMD_NR; i++)
         {
             if (strcmp(received_cmd, ir_command[i].description) == 0) {
-                ir_emitter_sky(ir_command[i].code);
+                for (uint8_t code_idx = 0; code_idx < ir_command[i].code_nr; code_idx++) {
+                    ir_emitter_sky(ir_command[i].code[code_idx]);
+                    vTaskDelay(pdMS_TO_TICKS(1000));
+                }
             }
         }
     }

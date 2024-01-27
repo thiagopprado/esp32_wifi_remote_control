@@ -86,6 +86,7 @@ void http_server_start(http_command_callback_t callback)
 {
     httpd_handle_t server = NULL;
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+    config.server_port = 8;
     config.lru_purge_enable = true;
 
     command_callback = callback;

@@ -24,7 +24,7 @@
 #include "http_server.h"
 
 #define IR_CMD_NR               (sizeof(ir_command) / sizeof (ir_command_t))
-#define IR_CMD_QUEUE_BUFFER_SZ  10
+#define IR_CMD_QUEUE_BUFFER_SZ  20
 #define IR_CMD_QUEUE_SZ         10
 #define IR_CMD_MULTICODE_NR     5
 
@@ -171,8 +171,53 @@ static ir_command_t ir_command[] = {
         .code_nr = 1,
     },
     {
+        .description = "globo",
+        .code = { IR_SKY_4, IR_SKY_0, IR_SKY_5, IR_SKY_ENTER },
+        .code_nr = 4,
+    },
+    {
+        .description = "sbt",
+        .code = { IR_SKY_4, IR_SKY_0, IR_SKY_9, IR_SKY_ENTER },
+        .code_nr = 4,
+    },
+    {
+        .description = "espn",
+        .code = { IR_SKY_5, IR_SKY_9, IR_SKY_8, IR_SKY_ENTER },
+        .code_nr = 4,
+    },
+    {
+        .description = "premiere",
+        .code = { IR_SKY_6, IR_SKY_3, IR_SKY_3, IR_SKY_ENTER },
+        .code_nr = 4,
+    },
+    {
         .description = "sportv",
         .code = { IR_SKY_4, IR_SKY_3, IR_SKY_9, IR_SKY_ENTER },
+        .code_nr = 4,
+    },
+    {
+        .description = "history",
+        .code = { IR_SKY_4, IR_SKY_7, IR_SKY_6, IR_SKY_ENTER },
+        .code_nr = 4,
+    },
+    {
+        .description = "tnt",
+        .code = { IR_SKY_5, IR_SKY_0, IR_SKY_8, IR_SKY_ENTER },
+        .code_nr = 4,
+    },
+    {
+        .description = "globo news",
+        .code = { IR_SKY_4, IR_SKY_4, IR_SKY_0, IR_SKY_ENTER },
+        .code_nr = 4,
+    },
+    {
+        .description = "turbo",
+        .code = { IR_SKY_4, IR_SKY_7, IR_SKY_2, IR_SKY_ENTER },
+        .code_nr = 4,
+    },
+    {
+        .description = "cnn",
+        .code = { IR_SKY_4, IR_SKY_7, IR_SKY_7, IR_SKY_ENTER },
         .code_nr = 4,
     },
 };

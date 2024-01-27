@@ -139,16 +139,22 @@ static ir_command_t ir_command[] = {
     },
 };
 
+#define IR_CMD_NR               (sizeof(ir_command) / sizeof (ir_command_t))
+#define IR_CMD_QUEUE_BUFFER_SZ  10
+#define IR_CMD_QUEUE_SZ         10
+
+QueueHandle_t ir_queue_handler = NULL;
+
 void http_command_callback(char *content, size_t len)
 {
-    size_t code_nr = sizeof(ir_command) / sizeof (ir_command_t);
+    char command[IR_CMD_QUEUE_BUFFER_SZ] = "";
 
-    for (size_t i = 0; i < code_nr; i++)
-    {
-        if (strcmp(content, ir_command[i].description) == 0) {
-            ir_emitter_sky(ir_command[i].code);
-        }
+    if (len > IR_CMD_QUEUE_BUFFER_SZ) {
+        len = IR_CMD_QUEUE_BUFFER_SZ - 1;
     }
+
+    strncpy(command, content, len);
+    xQueueSend(ir_queue_handler, command, 0);
 }
 
 void app_main(void)
@@ -160,7 +166,17 @@ void app_main(void)
     wifi_ctl_setup();
     http_server_start(http_command_callback);
 
+    ir_queue_handler = xQueueCreate(IR_CMD_QUEUE_SZ, IR_CMD_QUEUE_BUFFER_SZ * sizeof(char));
+
     while (true) {
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        char received_cmd[IR_CMD_QUEUE_BUFFER_SZ] = "";
+        xQueueReceive(ir_queue_handler, received_cmd, portMAX_DELAY);
+
+        for (size_t i = 0; i < IR_CMD_NR; i++)
+        {
+            if (strcmp(received_cmd, ir_command[i].description) == 0) {
+                ir_emitter_sky(ir_command[i].code);
+            }
+        }
     }
 }

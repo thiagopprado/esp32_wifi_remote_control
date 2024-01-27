@@ -256,7 +256,7 @@ void app_main(void)
             if (strcmp(received_cmd, ir_command[i].description) == 0) {
                 for (uint8_t code_idx = 0; code_idx < ir_command[i].code_nr; code_idx++) {
                     ir_emitter_sky(ir_command[i].code[code_idx]);
-                    vTaskDelay(pdMS_TO_TICKS(1000));
+                    vTaskDelay(pdMS_TO_TICKS(600));
                 }
             }
         }

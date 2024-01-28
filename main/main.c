@@ -217,7 +217,7 @@ static ir_command_t ir_command[] = {
     },
     {
         .description = "cnn",
-        .code = { IR_SKY_4, IR_SKY_7, IR_SKY_7, IR_SKY_ENTER },
+        .code = { IR_SKY_5, IR_SKY_7, IR_SKY_7, IR_SKY_ENTER },
         .code_nr = 4,
     },
 };

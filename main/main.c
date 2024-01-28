@@ -23,10 +23,13 @@
 
 #include "http_server.h"
 
-#define IR_CMD_NR               (sizeof(ir_command) / sizeof (ir_command_t))
-#define IR_CMD_QUEUE_BUFFER_SZ  20
-#define IR_CMD_QUEUE_SZ         10
-#define IR_CMD_MULTICODE_NR     5
+#define IR_CMD_QUEUE_BUFFER_SZ              20
+#define IR_CMD_QUEUE_SZ                     10
+#define IR_CMD_NR                           (sizeof(ir_command) / sizeof (ir_command_t))
+#define IR_CMD_MULTICODE_NR                 5
+#define IR_CMD_MULTICODE_INTERVAL           pdMS_TO_TICKS(1000)
+#define IR_CMD_SINGLECODE_REPEAT_NR         3
+#define IR_CMD_SINGLECODE_REPEAT_INTERVAL   pdMS_TO_TICKS(60)
 
 typedef struct {
     char* description;
@@ -222,9 +225,12 @@ static ir_command_t ir_command[] = {
     },
 };
 
-QueueHandle_t ir_queue_handler = NULL;
+static QueueHandle_t ir_queue_handler = NULL;
 
-void http_command_callback(char *content, size_t len)
+static void http_command_callback(char *content, size_t len);
+static void app_send_command(const ir_command_t *command);
+
+static void http_command_callback(char *content, size_t len)
 {
     char command[IR_CMD_QUEUE_BUFFER_SZ] = "";
 
@@ -234,6 +240,18 @@ void http_command_callback(char *content, size_t len)
 
     strncpy(command, content, len);
     xQueueSend(ir_queue_handler, command, 0);
+}
+
+static void app_send_command(const ir_command_t *command)
+{
+    for (uint8_t code_idx = 0; code_idx < command->code_nr; code_idx++) {
+        for (uint8_t i = 0; i < IR_CMD_SINGLECODE_REPEAT_NR; i++) {
+            ir_emitter_sky(code);
+            vTaskDelay(IR_CMD_SINGLECODE_REPEAT_INTERVAL);
+        }
+
+        vTaskDelay(IR_CMD_MULTICODE_INTERVAL);
+    }
 }
 
 void app_main(void)
@@ -251,13 +269,9 @@ void app_main(void)
         char received_cmd[IR_CMD_QUEUE_BUFFER_SZ] = "";
         xQueueReceive(ir_queue_handler, received_cmd, portMAX_DELAY);
 
-        for (size_t i = 0; i < IR_CMD_NR; i++)
-        {
+        for (size_t i = 0; i < IR_CMD_NR; i++) {
             if (strcmp(received_cmd, ir_command[i].description) == 0) {
-                for (uint8_t code_idx = 0; code_idx < ir_command[i].code_nr; code_idx++) {
-                    ir_emitter_sky(ir_command[i].code[code_idx]);
-                    vTaskDelay(pdMS_TO_TICKS(600));
-                }
+                app_send_command(&ir_command[i]);
             }
         }
     }

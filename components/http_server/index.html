@@ -223,8 +223,7 @@
             onclick="send_command('enter')" >
             Enter
         </button>
-        <br><br>
-        <br><br>
+        <br><br><br><br>
         <!-- Globo -->
         <button
             style="width: 310px;
@@ -439,6 +438,33 @@
                    font-size: 50px;"
             onclick="send_command('ch: 633')" >
         </button>
+        <br><br>
+        <form onsubmit="return false">
+            <label for="ch_number" style="font-size: 80px; position: relative; left: 170px;">
+                Canal:
+                <input
+                    type="number"
+                    id="ch_number"
+                    name="ch_number"
+                    min="0"
+                    max="999"
+                    required
+                    style="font-size: 80px;
+                           width: 300px;
+                           text-align: center;"
+                >
+            </label>
+            <br><br>
+            <input type='submit'
+                   value="Enviar"
+                   onclick="send_channel()"
+                   style="font-size: 60px;
+                          height: 80px;
+                          position: relative;
+                          left: 380px;"
+            >
+        </form>
+        <br><br>
     </body>
     <script>
     function send_command(cmd)
@@ -446,6 +472,11 @@
         var xhttp = new XMLHttpRequest();
         xhttp.open("POST", "/command");
         xhttp.send(cmd);
+    }
+    function send_channel()
+    {
+        var channel = document.getElementById('ch_number').valueAsNumber;
+        send_command('ch: ' + channel);
     }
     </script>
 </html>

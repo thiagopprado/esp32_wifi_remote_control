@@ -26,7 +26,7 @@
 #define IR_CMD_QUEUE_BUFFER_SZ              20
 #define IR_CMD_QUEUE_SZ                     10
 #define IR_CMD_NR                           (sizeof(ir_command) / sizeof (ir_command_t))
-#define IR_CMD_MULTICODE_INTERVAL           pdMS_TO_TICKS(1000)
+#define IR_CMD_MULTICODE_INTERVAL           pdMS_TO_TICKS(700)
 #define IR_CMD_SINGLECODE_REPEAT_NR         3
 #define IR_CMD_SINGLECODE_REPEAT_INTERVAL   pdMS_TO_TICKS(60)
 

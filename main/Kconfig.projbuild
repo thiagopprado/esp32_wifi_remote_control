@@ -26,4 +26,8 @@ menu "WIFI RC configuration"
         string "Netmask"
         default "255.255.255.0"
 
+    config HTTP_PORT
+        int "HTTP Port"
+        default 8
+
 endmenu
